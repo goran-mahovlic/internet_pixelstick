@@ -17,18 +17,18 @@ def convert( image ):
 	print "Size before converting"
 	# print image size
 	print img.size
-	# setting variable newwidth that holds new width value
-	newwidth = 100
+	# setting variable newwidth that holds new width value 
+	newwidth = 60
 	# setting variable that holds new angle value
 	angle = -90
 	# getting factor to maintain aspect ratio
 	wpercent = (newwidth/float(img.size[0]))
 	# setting new hight with maintaing aspect ratio
 	hsize = int((float(img.size[1])*float(wpercent)))
+        # rotate image
+        img = img.rotate(angle)
 	# resizing imaga
 	img = img.resize((newwidth,hsize), Image.ANTIALIAS)
-	# rotate image
-	img = img.rotate(angle)
 	# split image to rgb value needed for saving into bmp
 	r, g, b = img.split()
 	# merging all rgb data into img 
@@ -40,8 +40,8 @@ def convert( image ):
 	# print text
 	print "Get x and y color of each pixel"
 	# get each pixel value and print it
-	for x in range(hsize):
-		for y in range(newwidth):
+	for x in range(newwidth):
+		for y in range(hsize):
         	# get RGB values of (x,y) pixel
         		r, g, b = img.getpixel((x, y))
         		# print pixel values we will sore it later and send it to pixelstick
