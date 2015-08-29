@@ -10,6 +10,8 @@ uint8_t b = 0; // define the variable for b
 uint8_t x = 0;  // define the variable for led position
 
 void setup() {
+  Serial.begin(115200);
+  delay(10);
   strip.begin();
   strip.show(); // Initialize all pixels to 'off' 
 }
@@ -23,6 +25,6 @@ for (x = 1 ; x< 59 ; x++)
   strip.show();               // Update 
   delay(1000);                // wait for a sec
 }
-
+Serial.println("NewLine");
 }
 
