@@ -9,7 +9,7 @@ import socket
 from PIL import Image
 
 UDP_IP = "178.62.187.251" # server IP 
-UDP_PORT = 8888 # server port
+UDP_PORT = 2390 # server port
 sock = socket.socket(socket.AF_INET, # Internet
 socket.SOCK_DGRAM) # UDP
 sock.bind((UDP_IP, UDP_PORT))
