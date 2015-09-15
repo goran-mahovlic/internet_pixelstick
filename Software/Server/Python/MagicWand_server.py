@@ -86,20 +86,25 @@ while True:
     print "received message:", data
     if data.find('S') == 0: # If S is recieved start check for picture in folder
     	files = glob.glob('*.png')
-	    f = get_first_image(files)
+	f = get_first_image(files)
         print (f)
         # we convert image and save it to bmp so we can get XY
 	convert_save_image(f)
 	# we do not need this file any more
     	os.remove(f)
         # write "O" (OK) to file, now ESP will know it is ready to ask for picture data
-	    sendToText("O")
+	sendToText("O")
     elif data.find("C") == 0: # If C is recieved save config (size) data to html
         print (get_bmp_picture_size())
         sendToText(get_bmp_picture_size())
     elif data.find("XY") == 0: # If XY is recieved save rgb data to html
-        print (get_bmp_X_Y(5,5))
-        sendToText(get_bmp_X_Y(5,5))
+        pixel = data.split(';')
+        pixel_X =  int(pixel[1])
+        pixel_Y =  int(pixel[2])
+        print pixel_X
+        print pixel_Y
+        print (get_bmp_X_Y(pixel_X,pixel_Y))
+        sendToText(get_bmp_X_Y(pixel_X,pixel_Y))
     elif data.find("D") == 0: # If D is recieved delete BMP file and empty HTML file
         print ("BMP deleted")
         sendToText("")
