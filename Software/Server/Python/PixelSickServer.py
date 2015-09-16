@@ -55,12 +55,12 @@ def convert_save_image( image ):
     newwidth = 50
     # setting variable that holds new angle value
     angle = -90
+    # rotate image
+    img = img.rotate(angle)
     # getting factor to maintain aspect ratio
     wpercent = (newwidth/float(img.size[0]))
     # setting new hight with maintaing aspect ratio
     hsize = int((float(img.size[1])*float(wpercent)))
-    # rotate image
-    img = img.rotate(angle)
     # resizing imaga
     img = img.resize((newwidth,hsize), Image.ANTIALIAS)
     # split image to rgb value needed for saving into bmp
