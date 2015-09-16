@@ -84,16 +84,19 @@ def get_bmp_X_Y(x,y):
 while True:
     data, addr = sock.recvfrom(1024) # buffer size is 1024 bytes
     print "received message:", data
-    if data.find('S') == 0: # If S is recieved start check for picture in folder
+    if data.find("S") == 0: # If S is recieved start check for picture in folder
     	files = glob.glob('*.png')
-	f = get_first_image(files)
-        print (f)
-        # we convert image and save it to bmp so we can get XY
-	convert_save_image(f)
-	# we do not need this file any more
-    	os.remove(f)
-        # write "O" (OK) to file, now ESP will know it is ready to ask for picture data
-	sendToText("O")
+	    f = get_first_image(files)
+        print (f)        
+        if f is None:
+            sendToText("N")
+        else:
+            # we convert image and save it to bmp so we can get XY
+	        convert_save_image(f)
+	    	# we do not need this file any more
+    	    os.remove(f)
+            # write "O" (OK) to file, now ESP will know it is ready to ask for picture data
+	        sendToText("O")
     elif data.find("C") == 0: # If C is recieved save config (size) data to html
         print (get_bmp_picture_size())
         sendToText(get_bmp_picture_size())
