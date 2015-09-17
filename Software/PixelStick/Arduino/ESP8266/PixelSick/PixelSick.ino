@@ -84,16 +84,44 @@ void loop() {
   }
 else if (line.indexOf("Size:") > 0 )
   {
-line.trim();
+//char[] charsToTrim = { ' ', '\t' ,'S' , 'i', 'z' , 'e' , ':'};
+//line = line.Trim(charsToTrim);
+line.replace(" ", ""); 
+
 int configSize = line.length(); 
 int findDelimiter = line.indexOf(",");
-char tempWidth [5];
-for (int i = findDelimiter; i < configSize - 1; i++)
+int findOpenBracket = line.indexOf("(");
+int findCloseBracket = line.indexOf(")");
+line.toCharArray(charBuf, 50);
+sendMessage(charBuf);
+String(configSize).toCharArray(charBuf, 50);
+sendMessage(charBuf);
+String(findDelimiter).toCharArray(charBuf, 50);
+sendMessage(charBuf);
+char tempWidth [10];
+int i=0;
+for (int j = findOpenBracket + 1 ; j < findCloseBracket +1; j++)
 {
-tempWidth[i] = charBuf [i]
-width = atoi(tempWidth);
+tempWidth[i] = charBuf [j];
+i++;
+//sendMessage(tempWidth);
+//width = atoi(tempWidth);
 }
-sendMessage(tempWidth)
+sendMessage(tempWidth);
+line = String(tempWidth);
+findDelimiter = line.indexOf(",");
+findCloseBracket = line.indexOf(")");
+line.toCharArray(charBuf, 50);
+int j = 0;
+char Width [5];
+for(int i = findDelimiter + 1; i < findCloseBracket + 1 ; i++){
+Width[j] = charBuf [i];
+j++;
+}
+line = String(Width);
+line.replace(")", "");
+width = line.toInt();
+
   sendMessage("XY;0;0");
   strip.SetPixelColor(0, black);
   strip.SetPixelColor(1, black);
@@ -110,7 +138,7 @@ for (int i = 1; i < 50; i++)
 {
 delay(1000);
     for (int j = 1; j < width; j++){
-    tempXYstring = "XY;" + i + ";" + j;
+    tempXYstring = "XY;" + String(i) + ";" + String(j);
     tempXYstring.toCharArray(tempXY, 11);
     sendMessage(tempXY);
     }
