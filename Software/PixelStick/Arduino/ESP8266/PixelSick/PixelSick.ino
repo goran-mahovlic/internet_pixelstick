@@ -16,6 +16,7 @@ RgbColor green = RgbColor(0, colorSaturation, 0);
 RgbColor blue = RgbColor(0, 0, colorSaturation);
 RgbColor white = RgbColor(colorSaturation);
 RgbColor black = RgbColor(0);
+int width;
 
 unsigned int serverPort = 2390;
 IPAddress serverIP(178,62,187,251);
@@ -81,9 +82,19 @@ void loop() {
   strip.Show();
     sendMessage("Config");
   }
-  else if (line.indexOf("Size:") > 0 )
+else if (line.indexOf("Size:") > 0 )
   {
-    sendMessage("XY;1;1");
+line.trim();
+int configSize = line.length(); 
+int findDelimiter = line.indexOf(",");
+char tempWidth [5];
+for (int i = findDelimiter; i < configSize - 1; i++)
+{
+tempWidth[i] = charBuf [i]
+width = atoi(tempWidth);
+}
+sendMessage(tempWidth)
+  sendMessage("XY;0;0");
   strip.SetPixelColor(0, black);
   strip.SetPixelColor(1, black);
   strip.SetPixelColor(2, black);
@@ -91,7 +102,19 @@ void loop() {
   strip.Show();
   }
    else if(line.indexOf("Pixel") > 0 ){
-    sendMessage(charBuf);
+// sendMessage(charBuf);
+// Get RGB 
+    String tempXYstring;
+    char tempXY [11];
+for (int i = 1; i < 50; i++)
+{
+delay(1000);
+    for (int j = 1; j < width; j++){
+    tempXYstring = "XY;" + i + ";" + j;
+    tempXYstring.toCharArray(tempXY, 11);
+    sendMessage(tempXY);
+    }
+}
     delay(1000);
     sendMessage("Delete");
   }   
