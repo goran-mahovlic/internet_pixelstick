@@ -87,7 +87,7 @@ sendToText("No picture")
 while True:
     data, addr = sock.recvfrom(1024) # buffer size is 1024 bytes
     print data
-    if data.find("S") == 0: # If S is recieved start check for picture in folder
+    if data.find("Start") == 0: # If S is recieved start check for picture in folder
     	files = glob.glob('*.png')
 	f = get_first_image(files)
         print (f)        
@@ -104,7 +104,7 @@ while True:
     while pictureReady:
         data, addr = sock.recvfrom(1024) # buffer size is 1024 bytes
         print data
-        if data.find("C") == 0: # If C is recieved save config (size) data to html
+        if data.find("Config") == 0: # If C is recieved save config (size) data to html
             print (get_bmp_picture_size())
             sendToText("Size: " + str(get_bmp_picture_size()))
         elif data.find("XY") == 0: # If XY is recieved save rgb data to html
@@ -115,7 +115,7 @@ while True:
             print pixel_Y
             print ("Pixel: " + str(get_bmp_X_Y(pixel_X,pixel_Y)))
             sendToText("Pixel: " + str(get_bmp_X_Y(pixel_X,pixel_Y)))
-        elif data.find("D") == 0: # If D is recieved delete BMP file and empty HTML file
+        elif data.find("Delete") == 0: # If D is recieved delete BMP file and empty HTML file
             print ("BMP deleted")
             sendToText("All Done")
             os.remove(file_out)

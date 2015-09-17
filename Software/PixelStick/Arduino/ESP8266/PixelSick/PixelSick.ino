@@ -70,7 +70,7 @@ void loop() {
   strip.SetPixelColor(3, red);
   strip.Show();
   delay(5000);
-  sendMessage("S");
+  sendMessage("Start");
 }
   else if (line.indexOf("Picture is ready") > 0 )
   {
@@ -79,7 +79,7 @@ void loop() {
   strip.SetPixelColor(2, green);
   strip.SetPixelColor(3, green);
   strip.Show();
-    sendMessage("C");
+    sendMessage("Config");
   }
   else if (line.indexOf("Size:") > 0 )
   {
@@ -93,7 +93,7 @@ void loop() {
    else if(line.indexOf("Pixel") > 0 ){
     sendMessage(charBuf);
     delay(1000);
-    sendMessage("D");
+    sendMessage("Delete");
   }   
 }}
 
