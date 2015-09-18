@@ -17,6 +17,11 @@ RgbColor blue = RgbColor(0, 0, colorSaturation);
 RgbColor white = RgbColor(colorSaturation);
 RgbColor black = RgbColor(0);
 int width;
+int X;
+int Y;
+int R_data;
+int G_data;
+int B_data;
 
 unsigned int serverPort = 2390;
 IPAddress serverIP(178,62,187,251);
@@ -87,7 +92,6 @@ else if (line.indexOf("Size:") > 0 )
 //char[] charsToTrim = { ' ', '\t' ,'S' , 'i', 'z' , 'e' , ':'};
 //line = line.Trim(charsToTrim);
 line.replace(" ", ""); 
-
 int configSize = line.length(); 
 int findDelimiter = line.indexOf(",");
 int findOpenBracket = line.indexOf("(");
@@ -100,53 +104,65 @@ String(findDelimiter).toCharArray(charBuf, 50);
 sendMessage(charBuf);
 char tempWidth [10];
 int i=0;
-for (int j = findOpenBracket + 1 ; j < findCloseBracket +1; j++)
+for (int j = findDelimiter + 1 ; j < findCloseBracket + 1; j++)
 {
 tempWidth[i] = charBuf [j];
 i++;
-//sendMessage(tempWidth);
-//width = atoi(tempWidth);
 }
-sendMessage(tempWidth);
 line = String(tempWidth);
-findDelimiter = line.indexOf(",");
-findCloseBracket = line.indexOf(")");
-line.toCharArray(charBuf, 50);
-int j = 0;
-char Width [5];
-for(int i = findDelimiter + 1; i < findCloseBracket + 1 ; i++){
-Width[j] = charBuf [i];
-j++;
-}
-line = String(Width);
 line.replace(")", "");
 width = line.toInt();
-
-  sendMessage("XY;0;0");
+sendMessage("XY;0;0");
   strip.SetPixelColor(0, black);
   strip.SetPixelColor(1, black);
   strip.SetPixelColor(2, black);
   strip.SetPixelColor(3, black);
   strip.Show();
-  }
-   else if(line.indexOf("Pixel") > 0 ){
-// sendMessage(charBuf);
-// Get RGB 
-    String tempXYstring;
-    char tempXY [11];
-for (int i = 1; i < 50; i++)
-{
-delay(1000);
-    for (int j = 1; j < width; j++){
-    tempXYstring = "XY;" + String(i) + ";" + String(j);
-    tempXYstring.toCharArray(tempXY, 11);
-    sendMessage(tempXY);
-    }
+X = 0;
+Y = 0;
 }
-    delay(1000);
-    sendMessage("Delete");
-  }   
-}}
+else if(line.indexOf("Pixel") > 0 ){
+if (X == 49){
+Y++;
+X=0;
+delay(1000);
+}
+if (Y == width){
+sendMessage('Delete');
+}
+else{
+int XYSize = line.length();
+int findDelimiter = line.indexOf(",");
+int findOpenBracket = line.indexOf("(");
+int findCloseBracket = line.indexOf(")");
+line.toCharArray(charBuf, 50);
+sendMessage(charBuf);
+String(XYSize).toCharArray(charBuf, 50);
+sendMessage(charBuf);
+String(findDelimiter).toCharArray(charBuf, 50);
+sendMessage(charBuf);
+char tempXY [11];
+int i=0;
+for (int j = findDelimiter + 1 ; j < findCloseBracket + 1; j++)
+{
+tempXY[i] = charBuf [j];
+i++;
+}
+line = String(tempXY);
+line.replace(")", "");
+int[] RGB = line.ConvertAll(s.Split(','), int.Parse);
+R_data = RGB[0];
+G_data = RGB[1];
+B_data = RGB[2];
+// Finaly we Light a pixel
+strip.SetPixelColor(X, R_data,G_data,B_data);
+// And create next request
+String tempXYstring;
+delay(1000);
+tempXYstring = "XY;" + String(X) + ";" + String(Y);
+tempXYstring.toCharArray(tempXY, 11);
+sendMessage(tempXY);
+}}}}
 
 void sendMessage(char data[]) {
   port.beginPacket(serverIP,serverPort);
