@@ -83,9 +83,11 @@ def get_bmp_X_Y(x,y):
 		
 notDone = False
 pictureReady = False	
-sendToText("No picture")	
+sendToText("No picture")
+pixelGroup = ""
+	
 while True:
-    data, addr = sock.recvfrom(1024) # buffer size is 1024 bytes
+    data, addr = sock.recvfrom(10240) # buffer size is 1024 bytes
     print data
     if data.find("Start") == 0: # If S is recieved start check for picture in folder
     	files = glob.glob('*.png')
@@ -106,15 +108,24 @@ while True:
         print data
         if data.find("Config") == 0: # If C is recieved save config (size) data to html
             print (get_bmp_picture_size())
-            sendToText("Size: " + str(get_bmp_picture_size()))
-        elif data.find("XY") == 0: # If XY is recieved save rgb data to html
+            sendToText("Size: " + str(get_bmp_picture_size()) )
+        elif data.find("Y") == 0: # If XY is recieved save rgb data to html
             pixel = data.split(';')
-            pixel_X =  int(pixel[1])
-            pixel_Y =  int(pixel[2])
-            print pixel_X
+            #pixel_X =  int(pixel[1])
+            pixel_Y =  int(pixel[1])
+            #print pixel_X
             print pixel_Y
-            print ("Pixel: " + str(get_bmp_X_Y(pixel_X,pixel_Y)))
-            sendToText("Pixel: " + str(get_bmp_X_Y(pixel_X,pixel_Y)))
+            #print ("Pixel: " + str(get_bmp_X_Y(pixel_X,pixel_Y)))
+            #sendToText("Pixel: " + str(get_bmp_X_Y(pixel_X,pixel_Y)))
+            for x in range(0, 50):
+                pixelGroup = pixelGroup + str(get_bmp_X_Y(x,pixel_Y)) + ";"
+            pixelGroup = pixelGroup.replace("(", "")
+            pixelGroup = pixelGroup.replace(")", "")
+            pixelGroup = pixelGroup.replace(" ", "")
+            sendToText("Pixel: ;" + pixelGroup)
+
+            pixelGroup = ""
+
         elif data.find("Delete") == 0: # If D is recieved delete BMP file and empty HTML file
             print ("BMP deleted")
             sendToText("All Done")
