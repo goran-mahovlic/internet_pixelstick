@@ -51,6 +51,7 @@ void setup() {
   delay(2000);
   connectToWifi();
   initializeSDcard();
+  oneLine.reserve(600);
 }
 
 void loop() {
@@ -113,7 +114,7 @@ void LightTheStick (String line)
   strip.Show();
 }
 
-void sendMessage(char data[]) {
+void sendMessage(const char data[]) {
   port.beginPacket(serverIP, serverPort);
   port.write(data);
   port.endPacket();
