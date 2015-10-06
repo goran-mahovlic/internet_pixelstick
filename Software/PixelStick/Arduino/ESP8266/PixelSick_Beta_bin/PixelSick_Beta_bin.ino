@@ -21,17 +21,14 @@ const char* host = "178.62.187.251";
 const int httpPort = 80;
 char charBuf[20];
 const int chipSelect = 2;
-char temp;
+byte tempbyte;
 
 int R_data_int;
 int G_data_int;
 int B_data_int;
-int firstDelimiterIndex;
-int secondDelimiterIndex;
-int thirdDelimiterIndex;
-int fourthDelimiterIndex;
-int line;
-String oneLine;
+int pixel;
+int rgb;
+long bytecounter;
 
 NeoPixelBus strip = NeoPixelBus(pixelCount, pixelPin);
 
@@ -51,7 +48,6 @@ void setup() {
   delay(2000);
   connectToWifi();
   initializeSDcard();
-  oneLine.reserve(610);
 }
 
 void loop() {
@@ -59,75 +55,50 @@ void loop() {
   delay(5000);          //  we need to wait until server converts image
   clear_display();      // Clear OLED
   getDataFromWeb();
-  turnRedLeds(4);
+  turnRedLeds(50);
   delay(1000);
-  turnOffLeds(4);
-  turnGreenLeds(4);
+  turnOffLeds(50);
+  turnGreenLeds(50);
   delay(1000);
-  turnOffLeds(4);
+  turnOffLeds(50);
   delay(500);
   clear_display(); // Clear OLED
   WaitForButtonPress();
-  readSDfile("Picture.txt");
-// oneLine = ",230,225,211,231,225,211,232,226,213,232,227,214,232,227,214,233,227,215,234,228,216,234,229,216,234,230,217,235,231,218,235,231,218,236,232,219,237,233,220,237,233,221,238,234,222,238,234,223,239,235,224,239,235,225,239,236,225,240,236,226,241,237,227,241,238,227,242,238,228,242,238,228,242,239,228,243,238,228,243,239,228,243,239,229,243,239,229,243,240,230,244,240,230,244,240,230,243,240,230,243,240,230,243,240,230,243,240,230,243,240,230,243,239,230,243,239,230,243,239,229,243,239,229,243,239,228,242,239,228,242,238,228,242,238,227,241,238,227,240,237,226,240,236,226,239,235,225,239,234,224,";
-//for (int i = 0 ; i < 200 ; i++)
-//{
-// LightTheStick(oneLine);
-// }
-// turnOffAllLeds();
-  //delay(1000);
+  readSDfile("Picture.bin");
 }
 
 void readSDfile(String file)
 {
-  line = 1;
+  pixel = 0;
+  rgb = 0;
   myFile = SD.open((file));
   while (myFile.available()) {
-    temp = myFile.read();
-    if (temp == '\n') {
-      line++;
-      if (line > 12 &&  line < 20) {
-        if (oneLine.length()>50 && oneLine.length()<610)
-          {
-          LightTheStick(oneLine);
-          }
-      }
-      oneLine = "";
+    tempbyte = myFile.read();
+    switch (rgb) {
+      case 0:
+        R_data_int = int(tempbyte);
+        rgb++;
+        break;
+      case 1:
+        rgb++;
+        G_data_int = int(tempbyte);
+        break;
+      case 2:
+        B_data_int = int(tempbyte);
+        strip.SetPixelColor(pixel, R_data_int, G_data_int, B_data_int);
+        rgb = 0;
+        pixel++;
+        break;
     }
-    else {
-      oneLine = oneLine + String(temp);
+    if (pixel == 49) {
+      pixel = 0;
+      rgb = 0;
+      strip.Show();
+      delay(100);
     }
   }
   turnOffAllLeds();
   myFile.close();
-}
-
-void LightTheStick (String line)
-{
-  fourthDelimiterIndex = 0;
-  for (int i = 0; i < 50; i++) {
-  //  delay(2000);
-    firstDelimiterIndex = line.indexOf(',', fourthDelimiterIndex);
-    secondDelimiterIndex = line.indexOf(',', firstDelimiterIndex + 1);
-    thirdDelimiterIndex = line.indexOf(',', secondDelimiterIndex + 1);
-    fourthDelimiterIndex = line.indexOf(',', thirdDelimiterIndex + 1);
-    R_data_int = (line.substring(firstDelimiterIndex + 1, secondDelimiterIndex)).toInt();
-    G_data_int = (line.substring(secondDelimiterIndex + 1, thirdDelimiterIndex)).toInt();
-    B_data_int = (line.substring(thirdDelimiterIndex + 1, fourthDelimiterIndex)).toInt(); // To the end of the string
-    // Finaly we Light a pixel
-    strip.SetPixelColor(i, R_data_int, G_data_int, B_data_int);
-//    String(firstDelimiterIndex).toCharArray(charBuf, 20) ;
-//    sendMessage(charBuf);
-//    String(secondDelimiterIndex).toCharArray(charBuf, 20) ;
-//    sendMessage(charBuf);
-//    String(thirdDelimiterIndex).toCharArray(charBuf, 20) ;
-//    sendMessage(charBuf);
-//    String(fourthDelimiterIndex).toCharArray(charBuf, 20) ;
-//    sendMessage(charBuf);
-//    j++;
-    
-  }
-  strip.Show();
 }
 
 void sendMessage(const char data[]) {
@@ -142,7 +113,7 @@ void turnOffAllLeds() {
   strip.Show();
 }
 
-void initializeSDcard(){
+void initializeSDcard() {
   clear_display(); // Clear OLED
   sendStrXY("Initializing SD", 1, 0);
   if (!SD.begin(chipSelect)) {
@@ -157,8 +128,8 @@ void initializeSDcard(){
     strip.Show();
     delay(2000);
   }
-}  
-void connectToWifi(){
+}
+void connectToWifi() {
   clear_display(); // Clear OLED
   // We start by connecting to a WiFi network
   sendStrXY("Connecting to ", 1, 0);
@@ -178,7 +149,7 @@ void connectToWifi(){
   String(WiFi.localIP()).toCharArray(charBuf, 20) ;
   sendStrXY("10.254.151.134", 3, 0);
   delay(2000);
-  }
+}
 void getDataFromWeb()
 {
   // Use WiFiClient class to create TCP connections
@@ -187,7 +158,7 @@ void getDataFromWeb()
     return;
   }
   // We now create a URI for the request
-  String url = "http://178.62.187.251/picture.text";
+  String url = "http://178.62.187.251/picture.bin";
   clear_display(); // Clear OLED
   sendStrXY("Requesting URL: ", 1, 0);
   String(url).toCharArray(charBuf, 20) ;
@@ -202,20 +173,24 @@ void getDataFromWeb()
   if (client.available()) {
 
     // Check to see if the file exists:
-    if (SD.exists("Picture.txt")) {
+    if (SD.exists("Picture.bin")) {
       sendStrXY("File exists", 1, 0);
       sendStrXY("deleting old..", 2, 0);
-      SD.remove("Picture.txt");
+      SD.remove("Picture.bin");
     }
     else {
       sendStrXY("New file", 1, 0);
     }
-    myFile = SD.open("Picture.txt", FILE_WRITE);
+    myFile = SD.open("Picture.bin", FILE_WRITE);
     if (myFile) {
       sendStrXY("Writing to file...", 2, 0);
+      bytecounter = 0;
       while (client.connected()) {
+        bytecounter++;
         byte c = client.read();
-        myFile.write(c);
+        if (bytecounter > 272 && c != 0xFF) {
+          myFile.write(c);
+        }
       }
       // close the file:
       myFile.close();
@@ -225,30 +200,30 @@ void getDataFromWeb()
       // if the file didn't open, print an error:
       sendStrXY("error opening file", 2, 0);
     }
-   client.stop();
+    client.stop();
   }
-  }
+}
 
-void turnRedLeds(int leds){
+void turnRedLeds(int leds) {
   for (int j = 0 ; j < leds ; j++ )
   {
-  strip.SetPixelColor(j, red);
+    strip.SetPixelColor(j, red);
   }
   strip.Show();
 }
 
-void turnGreenLeds (int leds){
+void turnGreenLeds (int leds) {
   for (int j = 0 ; j < leds ; j++ )
   {
-  strip.SetPixelColor(j, green);
+    strip.SetPixelColor(j, green);
   }
   strip.Show();
 }
 
-void turnOffLeds (int leds){
+void turnOffLeds (int leds) {
   for (int j = 0 ; j < leds ; j++ )
   {
-  strip.SetPixelColor(j, black);
+    strip.SetPixelColor(j, black);
   }
   strip.Show();
 }
@@ -258,8 +233,8 @@ void WaitForButtonPress()
   sendStrXY("All done", 1, 0);
   sendStrXY("Press button to", 2, 0);
   sendStrXY("Start PixelSick", 3, 0);
-//  sendMessage("Delete");
-    while (analogRead(A0)>0){
-      delay(100);
-    }
-    }
+  //  sendMessage("Delete");
+  while (analogRead(A0) > 0) {
+    delay(100);
+  }
+}
