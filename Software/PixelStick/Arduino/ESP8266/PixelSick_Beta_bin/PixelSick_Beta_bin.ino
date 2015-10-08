@@ -74,6 +74,7 @@ void readSDfile(String file)
   myFile = SD.open((file));
   while (myFile.available()) {
     tempbyte = myFile.read();
+
     switch (rgb) {
       case 0:
         R_data_int = int(tempbyte);
@@ -90,11 +91,11 @@ void readSDfile(String file)
         pixel++;
         break;
     }
-    if (pixel == 49) {
-      pixel = 0;
+    if (pixel == 50) {
       rgb = 0;
+      pixel = 0;
       strip.Show();
-      delay(100);
+      delay(analogRead(A0)*3);
     }
   }
   turnOffAllLeds();
@@ -158,14 +159,14 @@ void getDataFromWeb()
     return;
   }
   // We now create a URI for the request
-  String url = "http://178.62.187.251/picture.bin";
+  String url = "/picture.bin";
   clear_display(); // Clear OLED
   sendStrXY("Requesting URL: ", 1, 0);
   String(url).toCharArray(charBuf, 20) ;
   sendStrXY(charBuf, 2, 0);
   delay(2000);
   // This will send the request to the server
-  client.print(String("GET ") + url + " HTTP/1.1\r\n" +
+  client.print("GET " + url + " HTTP/1.0\r\n" +
                "Host: " + host + "\r\n" +
                "Connection: close\r\n\r\n");
   delay(100);
@@ -234,7 +235,7 @@ void WaitForButtonPress()
   sendStrXY("Press button to", 2, 0);
   sendStrXY("Start PixelSick", 3, 0);
   //  sendMessage("Delete");
-  while (analogRead(A0) > 0) {
-    delay(100);
-  }
+//  while (analogRead(A0) > 0) {
+//    delay(100);
+//  }
 }
